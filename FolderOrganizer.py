@@ -28,6 +28,17 @@ def undo_last_operation(move_records, logger):
         except Exception as e:
             logger.error(f"Error reversing file move from {target_directory} to {original_path}: {e}")
 
+def organize_files_recursively(directory, logger, dry_run, move_records, sort_method):
+    for item in os.listdir(directory):
+        path = os.path.join(directory, item)
+        if os.path.isfile(path):
+            if sort_method == 'type':
+                organize_by_type(directory, logger, dry_run, move_records)
+            elif sort_method == 'date':
+                organize_by_date(directory, logger, dry_run, move_records)
+        elif os.path.isdir(path):
+            organize_files_recursively(path, logger, dry_run, move_records, sort_method)
+
 def organize_by_type(directory, logger, dry_run, move_records):
     for filename in os.listdir(directory):
         if os.path.isfile(os.path.join(directory, filename)):
@@ -58,10 +69,7 @@ def run_terminal_mode(args):
 
     move_records = []
 
-    if args.sort == 'type':
-        organize_by_type(args.directory, logger, args.dry_run, move_records)
-    else:
-        organize_by_date(args.directory, logger, args.dry_run, move_records)
+    organize_files_recursively(args.directory, logger, args.dry_run, move_records, args.sort)
 
     print("File organization completed with Terminal mode!")
 
@@ -98,10 +106,7 @@ def run_cli_mode():
 
     if confirm.lower() == 'y':
         logger = create_logger()
-        if sort_method == 'type':
-            organize_by_type(directory_path, logger, dry_run, move_records)
-        elif sort_method == 'date':
-            organize_by_date(directory_path, logger, dry_run, move_records)
+        organize_files_recursively(directory_path, logger, dry_run, move_records, sort_method)
         print("File organization completed with CLI mode!")
     else:
         print("File organization canceled.")
