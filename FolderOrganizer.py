@@ -3,6 +3,9 @@ import shutil
 import logging
 import argparse
 import time
+import tkinter as tk
+
+from tkinter import filedialog, messagebox
 
 def create_logger():
     logging.basicConfig(filename='file_organizer.log', level=logging.INFO, format='%(asctime)s: %(message)s')
@@ -114,6 +117,26 @@ def run_cli_mode():
     if move_records and input("Do you want to undo the last operation? (y/n): ").lower() == 'y':
         undo_last_operation(move_records, logger)
         print("Last operation has been undone.")
+
+def organize_files_gui():
+    directory = filedialog.askdirectory()
+    logger = create_logger()
+    move_records = []
+
+    if directory:
+        organize_by_type(directory, logger, False, move_records)
+        messagebox.showinfo("Success", "Filse have been organized!")
+
+def create_gui():
+    root = tk.Tk()
+    root.title("File Organizer")
+
+    organize_button = tk.Button(root, text="Organize Files", command=organize_files_gui)
+    organize_button.pack(pady=20)
+
+    root.mainloop()
+
+create_gui()
 
 def main():
     parser = argparse.ArgumentParser(description='Organize files in a directory.')
