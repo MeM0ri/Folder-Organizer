@@ -4,6 +4,7 @@ import logging
 import argparse
 import time
 import tkinter as tk
+import ttkbootstrap as ttk
 
 from tkinter import filedialog, messagebox
 
@@ -118,39 +119,50 @@ def run_cli_mode():
         undo_last_operation(move_records, logger)
         print("Last operation has been undone.")
 
-def organize_files_gui():
+def organize_files_gui(chosen_type):
     directory = filedialog.askdirectory()
     logger = create_logger()
     move_records = []
-
-    if directory:
+    
+    if chosen_type.get() == 1:
         organize_by_type(directory, logger, False, move_records)
-        messagebox.showinfo("Success", "Filse have been organized!")
+        messagebox.showinfo("Success", "Files have been organized by type!")
+    elif chosen_type.get() == 2:
+        organize_by_date(directory, logger, False, move_records)
+        messagebox.showinfo("Success", "Files have been organized by date!")
 
 def create_gui():
-    root = tk.Tk()
+    root = ttk.Window(themename = 'darkly')
     root.title("File Organizer")
+    
+    chosen_type = tk.IntVar(value=1)
+    
+    choose_organize_by_type = tk.Radiobutton(root, text = "Organize files by type", variable=chosen_type, value=1)
+    choose_organize_by_type.pack(pady=10)
 
-    organize_button = tk.Button(root, text="Organize Files", command=organize_files_gui)
+    choose_organize_by_date = tk.Radiobutton(root, text = "Organize files by date", variable=chosen_type, value=2)
+    choose_organize_by_date.pack(pady=10)
+
+    organize_button = tk.Button(root, text="Organize Files", command=lambda: organize_files_gui(chosen_type))
     organize_button.pack(pady=20)
 
     root.mainloop()
 
 create_gui()
 
-def main():
-    parser = argparse.ArgumentParser(description='Organize files in a directory.')
-    parser.add_argument('directory', nargs='?', help='Directory to organize')
-    parser.add_argument('--sort', choices=['type', 'date'], default='type', help='Sort by file type or creation date')
-    parser.add_argument('--dry_run', action='store_true', help='Simulate file organization without making changes')
+# def main():
+#     parser = argparse.ArgumentParser(description='Organize files in a directory.')
+#     parser.add_argument('directory', nargs='?', help='Directory to organize')
+#     parser.add_argument('--sort', choices=['type', 'date'], default='type', help='Sort by file type or creation date')
+#     parser.add_argument('--dry_run', action='store_true', help='Simulate file organization without making changes')
 
-    args = parser.parse_args()
+#     args = parser.parse_args()
 
-    #Determine if runing in CLI mode or in Terminal mode
-    if args.directory:
-        run_terminal_mode(args)
-    else:
-        run_cli_mode()
+#     #Determine if runing in CLI mode or in Terminal mode
+#     if args.directory:
+#         run_terminal_mode(args)
+#     else:
+#         run_cli_mode()
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
