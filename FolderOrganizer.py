@@ -121,15 +121,19 @@ def run_cli_mode():
 
 def organize_files_gui(chosen_type):
     directory = filedialog.askdirectory()
-    logger = create_logger()
-    move_records = []
-    
-    if chosen_type.get() == 1:
-        organize_by_type(directory, logger, False, move_records)
-        messagebox.showinfo("Success", "Files have been organized by type!")
-    elif chosen_type.get() == 2:
-        organize_by_date(directory, logger, False, move_records)
-        messagebox.showinfo("Success", "Files have been organized by date!")
+
+    if directory:
+        logger = create_logger()
+        move_records = []
+
+        if chosen_type.get() == 1:
+            sort_method = 'type'
+        elif chosen_type.get() == 2:
+            sort_method = 'date'
+        
+        organize_files_recursively(directory, logger, False, move_records, sort_method)
+        
+        messagebox.showinfo("Success", f"Files have been organized by {sort_method}!")
 
 def create_gui():
     root = ttk.Window(themename = 'darkly')
