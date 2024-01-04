@@ -119,21 +119,27 @@ def run_cli_mode():
         undo_last_operation(move_records, logger)
         print("Last operation has been undone.")
 
-def organize_files_gui(chosen_type):
-    directory = filedialog.askdirectory()
+def organize_files_gui(chosen_type, progress_bar, root):
+    try:
+        directory = filedialog.askdirectory()
 
-    if directory:
-        logger = create_logger()
-        move_records = []
+        if directory:
+            logger = create_logger()
+            move_records = []
 
-        if chosen_type.get() == 1:
-            sort_method = 'type'
-        elif chosen_type.get() == 2:
-            sort_method = 'date'
-        
-        organize_files_recursively(directory, logger, False, move_records, sort_method)
-        
-        messagebox.showinfo("Success", f"Files have been organized by {sort_method}!")
+            if chosen_type.get() == 1:
+                sort_method = 'type'
+            elif chosen_type.get() == 2:
+                sort_method = 'date'
+            
+            organize_files_recursively(directory, logger, False, move_records, sort_method)
+            
+            progress_bar['value'] = 50
+            root.update_idletasks()
+            messagebox.showinfo("Success", f"Files have been organized by {sort_method}!")
+            progress_bar['value'] = 0
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
 
 def create_gui():
     root = ttk.Window(themename = 'darkly')
@@ -147,7 +153,10 @@ def create_gui():
     choose_organize_by_date = tk.Radiobutton(root, text = "Organize files by date", variable=chosen_type, value=2)
     choose_organize_by_date.pack(pady=10)
 
-    organize_button = tk.Button(root, text="Organize Files", command=lambda: organize_files_gui(chosen_type))
+    progress_bar = ttk.Progressbar(root, orient=tk.HORIZONTAL, length=300, mode='determinate')
+    progress_bar.pack(pady=10)
+    
+    organize_button = tk.Button(root, text="Organize Files", command=lambda: organize_files_gui(chosen_type, progress_bar, root))
     organize_button.pack(pady=20)
 
     root.mainloop()
