@@ -7,10 +7,26 @@ import tkinter as tk
 import ttkbootstrap as ttk
 
 from tkinter import filedialog, messagebox
+from text_handler import TextHandler
 
-def create_logger():
-    logging.basicConfig(filename='file_organizer.log', level=logging.INFO, format='%(asctime)s: %(message)s')
-    return logging.getLogger()
+def create_logger(text_widget):
+    #Create logger
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    #File handler for writing to log file
+    file_handler = logging.FileHandler('file_organizer.log')
+    file_formatter = logging.Formatter('%(asctime)s: %(message)s')
+    file_handler.setFormatter(file_formatter)
+    logger.addHandler(file_handler)    
+
+    #Text widget handler for updating the GUI
+    text_handler = TextHandler(text_widget)
+    text_formatter = logging.Formatter('%(asctime)s: %(message)s')
+    text_handler.setFormatter(text_formatter)
+    logger.addHandler(text_handler)
+    
+    return logger
 
 def move_file(file_path, target_directory, logger, dry_run=False, move_records=None):
     if dry_run:
@@ -119,12 +135,21 @@ def run_cli_mode():
         undo_last_operation(move_records, logger)
         print("Last operation has been undone.")
 
-def organize_files_gui(chosen_type, progress_bar, root):
+def select_directory(directory_entry):
     try:
         directory = filedialog.askdirectory()
+        if directory:
+            directory_entry.delete(0, tk.END)
+            directory_entry.insert(0, directory)
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
+
+def organize_files_gui(chosen_type, progress_bar, root, directory_entry, text_widget):
+    try:
+        directory = directory_entry.get()
 
         if directory:
-            logger = create_logger()
+            logger = create_logger(text_widget)
             move_records = []
 
             if chosen_type.get() == 1:
@@ -148,15 +173,24 @@ def create_gui():
     chosen_type = tk.IntVar(value=1)
     
     choose_organize_by_type = tk.Radiobutton(root, text = "Organize files by type", variable=chosen_type, value=1)
-    choose_organize_by_type.pack(pady=10)
+    choose_organize_by_type.pack(pady=5)
 
     choose_organize_by_date = tk.Radiobutton(root, text = "Organize files by date", variable=chosen_type, value=2)
-    choose_organize_by_date.pack(pady=10)
+    choose_organize_by_date.pack(pady=5)
+
+    directory_entry = tk.Entry(root)
+    directory_entry.pack(pady = 5)
+
+    browse_button = tk.Button(root, text="Browse", command=lambda: select_directory(directory_entry))
+    browse_button.pack(pady=5)
+
+    log_text = tk.Text(root, height=5, state='disabled')
+    log_text.pack(pady=5)
 
     progress_bar = ttk.Progressbar(root, orient=tk.HORIZONTAL, length=300, mode='determinate')
     progress_bar.pack(pady=10)
     
-    organize_button = tk.Button(root, text="Organize Files", command=lambda: organize_files_gui(chosen_type, progress_bar, root))
+    organize_button = tk.Button(root, text="Organize Files", command=lambda: organize_files_gui(chosen_type, progress_bar, root, directory_entry, log_text))
     organize_button.pack(pady=20)
 
     root.mainloop()
