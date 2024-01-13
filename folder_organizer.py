@@ -15,7 +15,7 @@ def create_logger(text_widget):
     logger.setLevel(logging.INFO)
 
     #File handler for writing to log file
-    file_handler = logging.FileHandler('file_organizer.log')
+    file_handler = logging.FileHandler('file_organizer.log', encoding='utf-8')
     file_formatter = logging.Formatter('%(asctime)s: %(message)s')
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)    
@@ -48,7 +48,7 @@ def undo_last_operation(move_records, logger):
         except Exception as e:
             logger.error(f"Error reversing file move from {target_directory} to {original_path}: {e}")
 
-def organize_files_recursively(directory, logger, dry_run, move_records, sort_method):
+def organize_files_recursively(directory, logger, dry_run, move_records, sort_method, include_subdirs):
     for item in os.listdir(directory):
         path = os.path.join(directory, item)
         if os.path.isfile(path):
@@ -56,8 +56,8 @@ def organize_files_recursively(directory, logger, dry_run, move_records, sort_me
                 organize_by_type(directory, logger, dry_run, move_records)
             elif sort_method == 'date':
                 organize_by_date(directory, logger, dry_run, move_records)
-        elif os.path.isdir(path):
-            organize_files_recursively(path, logger, dry_run, move_records, sort_method)
+        elif os.path.isdir(path) and include_subdirs:
+            organize_files_recursively(path, logger, dry_run, move_records, sort_method, include_subdirs)
 
 def organize_by_type(directory, logger, dry_run, move_records):
     for filename in os.listdir(directory):
@@ -89,7 +89,7 @@ def run_terminal_mode(args):
 
     move_records = []
 
-    organize_files_recursively(args.directory, logger, args.dry_run, move_records, args.sort)
+    organize_files_recursively(args.directory, logger, args.dry_run, move_records, args.sort, args.include_subdirs)
 
     print("File organization completed with Terminal mode!")
 
@@ -110,6 +110,10 @@ def run_cli_mode():
     print("2: Sort by creation date")
     sorting_method_choice = input("Enter your choice (1 or 2): ")
 
+    #Include subdirs option
+    include_subdirs_choice = input("Do you want to include subdirectories for a file organizer run? (y/n): ")
+    include_subdirs = True if include_subdirs_choice.lower() == 'y' else False
+
     #Dry run option
     dry_run_choice = input("Do you want to perform a dry run? (y/n): ")
     dry_run = True if dry_run_choice.lower() == 'y' else False
@@ -126,7 +130,7 @@ def run_cli_mode():
 
     if confirm.lower() == 'y':
         logger = create_logger()
-        organize_files_recursively(directory_path, logger, dry_run, move_records, sort_method)
+        organize_files_recursively(directory_path, logger, dry_run, move_records, sort_method, include_subdirs)
         print("File organization completed with CLI mode!")
     else:
         print("File organization canceled.")
@@ -144,7 +148,7 @@ def select_directory(directory_entry):
     except Exception as e:
         messagebox.showerror("Error", str(e))
 
-def organize_files_gui(chosen_type, progress_bar, root, directory_entry, text_widget):
+def organize_files_gui(chosen_type, progress_bar, root, directory_entry, text_widget, include_subdirs_var, dry_run_var):
     try:
         directory = directory_entry.get()
 
@@ -156,8 +160,11 @@ def organize_files_gui(chosen_type, progress_bar, root, directory_entry, text_wi
                 sort_method = 'type'
             elif chosen_type.get() == 2:
                 sort_method = 'date'
+
+            dry_run = dry_run_var.get()
+            include_subdirs = include_subdirs_var.get()
             
-            organize_files_recursively(directory, logger, False, move_records, sort_method)
+            organize_files_recursively(directory, logger, dry_run, move_records, sort_method, include_subdirs)
             
             progress_bar['value'] = 50
             root.update_idletasks()
@@ -170,6 +177,7 @@ def create_gui():
     root = ttk.Window(themename = 'darkly')
     root.title("File Organizer")
     
+    #Choose type var and radiobuttons
     chosen_type = tk.IntVar(value=1)
     
     choose_organize_by_type = tk.Radiobutton(root, text = "Organize files by type", variable=chosen_type, value=1)
@@ -178,19 +186,33 @@ def create_gui():
     choose_organize_by_date = tk.Radiobutton(root, text = "Organize files by date", variable=chosen_type, value=2)
     choose_organize_by_date.pack(pady=5)
 
+    #Checkbox for recursive organization
+    include_subdirs_var = tk.BooleanVar()
+    include_subdirs_check = tk.Checkbutton(root, text = "Include Subdirectories", variable=include_subdirs_var)
+    include_subdirs_check.pack(pady=5)
+
+    #Checkbox for dry run
+    dry_run_var = tk.BooleanVar()
+    dry_run_check = tk.Checkbutton(root, text = "Dry Run", variable=dry_run_var)
+    dry_run_check.pack(pady=5)
+
+    #Var for directory path and button for search folder through browser
     directory_entry = tk.Entry(root)
     directory_entry.pack(pady = 5)
 
     browse_button = tk.Button(root, text="Browse", command=lambda: select_directory(directory_entry))
     browse_button.pack(pady=5)
 
+    #Log text var
     log_text = tk.Text(root, height=5, state='disabled')
     log_text.pack(pady=5)
 
+    #Progress bar var
     progress_bar = ttk.Progressbar(root, orient=tk.HORIZONTAL, length=300, mode='determinate')
     progress_bar.pack(pady=10)
     
-    organize_button = tk.Button(root, text="Organize Files", command=lambda: organize_files_gui(chosen_type, progress_bar, root, directory_entry, log_text))
+    #Button for running organize script
+    organize_button = tk.Button(root, text="Organize Files", command=lambda: organize_files_gui(chosen_type, progress_bar, root, directory_entry, log_text, include_subdirs_var, dry_run_var))
     organize_button.pack(pady=20)
 
     root.mainloop()
@@ -202,6 +224,7 @@ create_gui()
 #     parser.add_argument('directory', nargs='?', help='Directory to organize')
 #     parser.add_argument('--sort', choices=['type', 'date'], default='type', help='Sort by file type or creation date')
 #     parser.add_argument('--dry_run', action='store_true', help='Simulate file organization without making changes')
+#     parser.add_argument('--include_subdirs', action='store_true', help='Include subdirs to file organizer run')
 
 #     args = parser.parse_args()
 
