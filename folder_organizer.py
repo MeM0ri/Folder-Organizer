@@ -15,7 +15,7 @@ def create_logger(text_widget):
     logger.setLevel(logging.INFO)
 
     #File handler for writing to log file
-    file_handler = logging.FileHandler('file_organizer.log', encoding='utf-8')
+    file_handler = logging.FileHandler('file_organizer.log', encoding = 'utf-8')
     file_formatter = logging.Formatter('%(asctime)s: %(message)s')
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)    
@@ -28,7 +28,7 @@ def create_logger(text_widget):
     
     return logger
 
-def move_file(file_path, target_directory, logger, dry_run=False, move_records=None):
+def move_file(file_path, target_directory, logger, dry_run = False, move_records = None):
     if dry_run:
         logger.info(f"[DRY RUN] Would move file {file_path} to {target_directory}")
     else:
@@ -177,54 +177,69 @@ def create_gui():
     root = ttk.Window(themename = 'darkly')
     root.title("File Organizer")
     
-    #Choose type var and radiobuttons
-    chosen_type = tk.IntVar(value=1)
-    
-    choose_organize_by_type = tk.Radiobutton(root, text = "Organize files by type", variable=chosen_type, value=1)
-    choose_organize_by_type.pack(pady=5)
+    all_options_frame = ttk.Frame(root)
+    all_options_frame.pack(side = tk.TOP, fill = "both", expand = True, padx = 5, pady = 5)
 
-    choose_organize_by_date = tk.Radiobutton(root, text = "Organize files by date", variable=chosen_type, value=2)
-    choose_organize_by_date.pack(pady=5)
+    #Choose type var and radiobuttons
+    sorting_type_frame = ttk.LabelFrame(all_options_frame, text = "Sorting Options")
+    sorting_type_frame.pack(side = tk.LEFT, fill = "both", expand = True, padx = 5, pady = 5)
+
+    chosen_type = tk.IntVar(value = 1)
+    
+    choose_organize_by_type = tk.Radiobutton(sorting_type_frame, text = "Organize files by type", variable = chosen_type, value = 1)
+    choose_organize_by_type.pack(pady = 3)
+
+    choose_organize_by_date = tk.Radiobutton(sorting_type_frame, text = "Organize files by date", variable = chosen_type, value = 2)
+    choose_organize_by_date.pack(pady = 3)
 
     #Checkbox for recursive organization
+    settings_frame = ttk.LabelFrame(all_options_frame, text = "Settings")
+    settings_frame.pack(side = tk.LEFT, fill = "both", expand = True, padx = 5, pady = 5)
+
     include_subdirs_var = tk.BooleanVar()
-    include_subdirs_check = tk.Checkbutton(root, text = "Include Subdirectories", variable=include_subdirs_var)
-    include_subdirs_check.pack(pady=5)
+    include_subdirs_check = tk.Checkbutton(settings_frame, text = "Include Subdirectories", variable = include_subdirs_var)
+    include_subdirs_check.pack(pady = 3)
 
     #Checkbox for dry run
     dry_run_var = tk.BooleanVar()
-    dry_run_check = tk.Checkbutton(root, text = "Dry Run", variable=dry_run_var)
-    dry_run_check.pack(pady=5)
+    dry_run_check = tk.Checkbutton(settings_frame, text = "Dry Run", variable = dry_run_var)
+    dry_run_check.pack(pady = 3)
 
     #Var for directory path and button for search folder through browser
-    directory_entry = tk.Entry(root)
-    directory_entry.pack(pady = 5)
+    directory_path_frame = ttk.LabelFrame(root, text = "Directory Selection")
+    directory_path_frame.pack(side = tk.TOP, fill = "both", expand = True, padx = 5, pady = 5)
 
-    browse_button = tk.Button(root, text="Browse", command=lambda: select_directory(directory_entry))
-    browse_button.pack(pady=5)
+    directory_entry = tk.Entry(directory_path_frame)
+    directory_entry.pack(side = tk.LEFT, pady = 3, padx = (5, 0))
+
+    browse_button = tk.Button(directory_path_frame, text = "Browse", command = lambda: select_directory(directory_entry))
+    browse_button.pack(side = tk.LEFT, pady = 3, padx = (0, 5))
 
     #Log text var
-    log_text = tk.Text(root, height=5, state='disabled')
-    log_text.pack(pady=5)
+    log_frame = ttk.LabelFrame(root, text = "File Organizer Logs")
+    log_frame.pack(side = tk.TOP, fill = "both", expand = True, padx = 5, pady = 5)
+
+    log_text = tk.Text(log_frame, height = 5, state = 'disabled')
+    log_text.pack(pady = 5)
 
     #Progress bar var
-    progress_bar = ttk.Progressbar(root, orient=tk.HORIZONTAL, length=300, mode='determinate')
-    progress_bar.pack(pady=10)
+    progress_bar = ttk.Progressbar(root, orient = tk.HORIZONTAL, length = 300, mode = 'determinate')
+    progress_bar.pack(side = tk.TOP, pady = 10)
     
     #Button for running organize script
-    organize_button = tk.Button(root, text="Organize Files", command=lambda: organize_files_gui(chosen_type, progress_bar, root, directory_entry, log_text, include_subdirs_var, dry_run_var))
-    organize_button.pack(pady=20)
+    organize_button = tk.Button(root, text = "Organize Files", command = lambda: organize_files_gui(chosen_type, progress_bar, root, directory_entry, log_text, include_subdirs_var, dry_run_var))
+    organize_button.pack(side = tk.TOP, pady = 20)
 
     root.mainloop()
 
 create_gui()
 
 # def main():
-#     parser = argparse.ArgumentParser(description='Organize files in a directory.')
-#     parser.add_argument('directory', nargs='?', help='Directory to organize')
-#     parser.add_argument('--sort', choices=['type', 'date'], default='type', help='Sort by file type or creation date')
-#     parser.add_argument('--dry_run', action='store_true', help='Simulate file organization without making changes')
-#     parser.add_argument('--include_subdirs', action='store_true', help='Include subdirs to file organizer run')
+#     parser = argparse.ArgumentParser(description = 'Organize files in a directory.')
+#     parser.add_argument('directory', nargs = '?', help = 'Directory to organize')
+#     parser.add_argument('--sort', choices = ['type', 'date'], default = 'type', help = 'Sort by file type or creation date')
+#     parser.add_argument('--dry_run', action = 'store_true', help = 'Simulate file organization without making changes')
+#     parser.add_argument('--include_subdirs', action = 'store_true', help = 'Include subdirs to file organizer run')
 
 #     args = parser.parse_args()
 
