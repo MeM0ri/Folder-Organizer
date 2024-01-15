@@ -182,7 +182,7 @@ def create_gui():
 
     #Choose type var and radiobuttons
     sorting_type_frame = ttk.LabelFrame(all_options_frame, text = "Sorting Options")
-    sorting_type_frame.pack(side = tk.LEFT, fill = "both", expand = True, padx = 5, pady = 5)
+    sorting_type_frame.pack(side = tk.LEFT, fill = "both", expand = True, padx = 5, pady = 5, ipadx = 3, ipady = 3)
 
     chosen_type = tk.IntVar(value = 1)
     
@@ -194,7 +194,7 @@ def create_gui():
 
     #Checkbox for recursive organization
     settings_frame = ttk.LabelFrame(all_options_frame, text = "Settings")
-    settings_frame.pack(side = tk.LEFT, fill = "both", expand = True, padx = 5, pady = 5)
+    settings_frame.pack(side = tk.LEFT, fill = "both", expand = True, padx = 5, pady = 5, ipadx = 3, ipady = 3)
 
     include_subdirs_var = tk.BooleanVar()
     include_subdirs_check = tk.Checkbutton(settings_frame, text = "Include Subdirectories", variable = include_subdirs_var)
@@ -209,10 +209,13 @@ def create_gui():
     directory_path_frame = ttk.LabelFrame(root, text = "Directory Selection")
     directory_path_frame.pack(side = tk.TOP, fill = "both", expand = True, padx = 5, pady = 5)
 
-    directory_entry = tk.Entry(directory_path_frame)
+    centered_frame = ttk.Frame(directory_path_frame)
+    centered_frame.pack(side = tk.TOP, expand = True, padx = 5, pady = 5)
+
+    directory_entry = tk.Entry(centered_frame, width = 50)
     directory_entry.pack(side = tk.LEFT, pady = 3, padx = (5, 0))
 
-    browse_button = tk.Button(directory_path_frame, text = "Browse", command = lambda: select_directory(directory_entry))
+    browse_button = tk.Button(centered_frame, text = "Browse", command = lambda: select_directory(directory_entry))
     browse_button.pack(side = tk.LEFT, pady = 3, padx = (0, 5))
 
     #Log text var
@@ -220,7 +223,7 @@ def create_gui():
     log_frame.pack(side = tk.TOP, fill = "both", expand = True, padx = 5, pady = 5)
 
     log_text = tk.Text(log_frame, height = 5, state = 'disabled')
-    log_text.pack(pady = 5)
+    log_text.pack(padx = 5, pady = 5)
 
     #Progress bar var
     progress_bar = ttk.Progressbar(root, orient = tk.HORIZONTAL, length = 300, mode = 'determinate')
