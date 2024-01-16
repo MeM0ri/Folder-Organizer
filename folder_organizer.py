@@ -9,7 +9,7 @@ import ttkbootstrap as ttk
 from tkinter import filedialog, messagebox
 from text_handler import TextHandler
 
-def create_logger(text_widget):
+def create_logger(text_widget = None):
     #Create logger
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
@@ -20,11 +20,12 @@ def create_logger(text_widget):
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)    
 
-    #Text widget handler for updating the GUI
-    text_handler = TextHandler(text_widget)
-    text_formatter = logging.Formatter('%(asctime)s: %(message)s')
-    text_handler.setFormatter(text_formatter)
-    logger.addHandler(text_handler)
+    #Text widget handler for updating the GUI (only if text_widget is provided)
+    if text_widget is not None:
+        text_handler = TextHandler(text_widget)
+        text_formatter = logging.Formatter('%(asctime)s: %(message)s')
+        text_handler.setFormatter(text_formatter)
+        logger.addHandler(text_handler)
     
     return logger
 
@@ -235,22 +236,23 @@ def create_gui():
 
     root.mainloop()
 
-create_gui()
+def main():
+    parser = argparse.ArgumentParser(description = 'Organize files in a directory.')
+    parser.add_argument('--run_mode', choices = ['gui', 'cli', 'terminal'], default = 'gui')
+    parser.add_argument('directory', nargs = '?', help = 'Directory to organize')
+    parser.add_argument('--sort', choices = ['type', 'date'], default = 'type', help = 'Sort by file type or creation date')
+    parser.add_argument('--dry_run', action = 'store_true', help = 'Simulate file organization without making changes')
+    parser.add_argument('--include_subdirs', action = 'store_true', help = 'Include subdirs to file organizer run')
 
-# def main():
-#     parser = argparse.ArgumentParser(description = 'Organize files in a directory.')
-#     parser.add_argument('directory', nargs = '?', help = 'Directory to organize')
-#     parser.add_argument('--sort', choices = ['type', 'date'], default = 'type', help = 'Sort by file type or creation date')
-#     parser.add_argument('--dry_run', action = 'store_true', help = 'Simulate file organization without making changes')
-#     parser.add_argument('--include_subdirs', action = 'store_true', help = 'Include subdirs to file organizer run')
+    args = parser.parse_args()
 
-#     args = parser.parse_args()
+    #Determine if runing in CLI mode or in Terminal mode
+    if args.run_mode == 'terminal' and args.directory:
+        run_terminal_mode(args)
+    elif args.run_mode == 'cli':
+        run_cli_mode()
+    elif args.run_mode == 'gui':
+        create_gui()
 
-#     #Determine if runing in CLI mode or in Terminal mode
-#     if args.directory:
-#         run_terminal_mode(args)
-#     else:
-#         run_cli_mode()
-
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
