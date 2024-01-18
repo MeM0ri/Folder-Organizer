@@ -1,9 +1,8 @@
 import tkinter as tk
 import ttkbootstrap as ttk
 
-from logger import create_logger
-from recursive_file_organization import organize_files_recursively
 from tkinter import filedialog, messagebox
+from run_modes.gui_mode import run_gui_mode
 
 def select_directory(directory_entry):
     try:
@@ -11,31 +10,6 @@ def select_directory(directory_entry):
         if directory:
             directory_entry.delete(0, tk.END)
             directory_entry.insert(0, directory)
-    except Exception as e:
-        messagebox.showerror("Error", str(e))
-
-def run_gui_mode(chosen_type, progress_bar, root, directory_entry, text_widget, include_subdirs_var, dry_run_var):
-    try:
-        directory = directory_entry.get()
-
-        if directory:
-            logger = create_logger(text_widget)
-            move_records = []
-
-            if chosen_type.get() == 1:
-                sort_method = 'type'
-            elif chosen_type.get() == 2:
-                sort_method = 'date'
-
-            dry_run = dry_run_var.get()
-            include_subdirs = include_subdirs_var.get()
-            
-            organize_files_recursively(directory, logger, dry_run, move_records, sort_method, include_subdirs)
-            
-            progress_bar['value'] = 50
-            root.update_idletasks()
-            messagebox.showinfo("Success", f"Files have been organized by {sort_method}!")
-            progress_bar['value'] = 0
     except Exception as e:
         messagebox.showerror("Error", str(e))
 
