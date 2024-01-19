@@ -70,7 +70,13 @@ def create_gui():
     progress_bar.pack(side = tk.TOP, pady = 10)
     
     #Button for running organize script
-    organize_button = tk.Button(root, text = "Organize Files", command = lambda: run_gui_mode(chosen_type, progress_bar, root, directory_entry, log_text, include_subdirs_var, dry_run_var))
-    organize_button.pack(side = tk.TOP, pady = 20)
+    buttons_frame = ttk.Frame(root)
+    buttons_frame.pack(side = tk.TOP, expand = True, padx = 5, pady = 5, ipadx = 3, ipady = 3)
+    
+    organize_button = tk.Button(buttons_frame, text = "Organize Files", command = lambda: run_gui_mode(chosen_type, progress_bar, undo_button, root, directory_entry, log_text, include_subdirs_var, dry_run_var))
+    organize_button.pack(side = tk.LEFT, pady = 3, padx = (5, 0))
+
+    undo_button = tk.Button(buttons_frame, text = "Undo", state = 'disabled')
+    undo_button.pack(side = tk.LEFT, pady = 3, padx = (0, 5))
 
     root.mainloop()

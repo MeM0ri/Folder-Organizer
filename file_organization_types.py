@@ -1,7 +1,7 @@
 import os
 import time
 
-from file_operations import move_file, undo_last_operation
+from file_operations import move_file
 
 def organize_by_type(directory, logger, dry_run, move_records):
     for filename in os.listdir(directory):
