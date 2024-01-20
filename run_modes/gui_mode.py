@@ -27,6 +27,6 @@ def run_gui_mode(chosen_type, progress_bar, undo_button, root, directory_entry, 
             progress_bar['value'] = 0
 
             undo_button['state'] = 'normal'
-            undo_button['command'] = lambda: undo_last_operation(move_records, logger)
+            undo_button['command'] = lambda: undo_last_operation(move_records, logger, undo_button)
     except Exception as e:
         messagebox.showerror("Error", str(e))

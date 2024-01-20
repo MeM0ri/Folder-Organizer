@@ -14,6 +14,10 @@ def select_directory(directory_entry):
         messagebox.showerror("Error", str(e))
 
 def create_gui():
+
+    def on_directory_change(*args):
+        undo_button['state'] = 'disabled'
+
     root = ttk.Window(themename = 'darkly')
     root.title("File Organizer")
     
@@ -52,7 +56,10 @@ def create_gui():
     centered_frame = ttk.Frame(directory_path_frame)
     centered_frame.pack(side = tk.TOP, expand = True, padx = 5, pady = 5)
 
-    directory_entry = tk.Entry(centered_frame, width = 50)
+    directory_var = tk.StringVar()
+    directory_var.trace_add('write', on_directory_change)
+
+    directory_entry = tk.Entry(centered_frame, width = 50, textvariable = directory_var)
     directory_entry.pack(side = tk.LEFT, pady = 3, padx = (5, 0))
 
     browse_button = tk.Button(centered_frame, text = "Browse", command = lambda: select_directory(directory_entry))
