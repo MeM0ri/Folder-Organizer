@@ -70,7 +70,7 @@ def create_gui():
     log_frame.pack(side = tk.TOP, fill = "both", expand = True, padx = 5, pady = 5)
 
     log_text = tk.Text(log_frame, height = 5, state = 'disabled')
-    log_text.pack(padx = 5, pady = 5)
+    log_text.pack(fill = "both", expand = True, padx = 5, pady = 5)
 
     #Progress bar var
     progress_bar = ttk.Progressbar(root, orient = tk.HORIZONTAL, length = 300, mode = 'determinate')

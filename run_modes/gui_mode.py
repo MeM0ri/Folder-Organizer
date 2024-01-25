@@ -1,3 +1,5 @@
+import tkinter as tk
+
 from logger import create_logger
 from tkinter import messagebox
 from file_operations import undo_last_operation
@@ -26,7 +28,8 @@ def run_gui_mode(chosen_type, progress_bar, undo_button, root, directory_entry, 
             messagebox.showinfo("Success", f"Files have been organized by {sort_method}!")
             progress_bar['value'] = 0
 
-            undo_button['state'] = 'normal'
-            undo_button['command'] = lambda: undo_last_operation(move_records, logger, undo_button)
+            if dry_run_var.get() == 0 and text_widget.get("1.0", tk.END).strip():
+                undo_button['state'] = 'normal'
+                undo_button['command'] = lambda: undo_last_operation(move_records, logger, undo_button)
     except Exception as e:
         messagebox.showerror("Error", str(e))
