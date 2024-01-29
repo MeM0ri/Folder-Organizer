@@ -21,10 +21,8 @@ def run_gui_mode(chosen_type, progress_bar, undo_button, root, directory_entry, 
             dry_run = dry_run_var.get()
             include_subdirs = include_subdirs_var.get()
             
-            organize_files_recursively(directory, logger, dry_run, move_records, sort_method, include_subdirs)
+            organize_files_recursively(directory, logger, dry_run, move_records, sort_method, include_subdirs, progress_bar, root)
             
-            progress_bar['value'] = 50
-            root.update_idletasks()
             messagebox.showinfo("Success", f"Files have been organized by {sort_method}!")
             progress_bar['value'] = 0
 

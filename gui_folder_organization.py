@@ -119,7 +119,7 @@ def create_gui():
     #Progress bar var
     progress_bar = ttk.Floodgauge(
         root,
-        font = ("Helvetica", 18, 'bold'),
+        font = (None, 14, 'bold'),
         mask = "{}%",
         maximum = 100,
         orient = HORIZONTAL, 

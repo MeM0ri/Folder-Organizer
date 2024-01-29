@@ -9,7 +9,7 @@ def move_file(file_path, target_directory, logger, dry_run = False, move_records
             shutil.move(file_path, target_directory)
             logger.info(f"Move file {file_path} to {target_directory}")
             if move_records is not None:
-                move_records.append((target_directory, file_path))  #Recorde file move for undo feature
+                move_records.append((target_directory, file_path)) 
         except Exception as e:
             logger.error(f"Error moveing file {file_path} to {target_directory}: {e}")
 
