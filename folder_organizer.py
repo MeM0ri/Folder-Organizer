@@ -1,4 +1,5 @@
 import argparse
+import file_counter
 
 from gui_folder_organization import create_gui                      #Imported from gui_folder_organization.py. GUI mode runs in this  code.
 from run_modes.terminal_mode import run_terminal_mode               #Imported from terminal_mode.py
@@ -13,6 +14,9 @@ def main():
     parser.add_argument('--include_subdirs', action = 'store_true', help = 'Include subdirs to file organizer run')
 
     args = parser.parse_args()
+
+    file_counter.filesCount = 0
+    file_counter.curentFileNum = 0        
 
     #Determine if runing in CLI mode or in Terminal mode
     if args.run_mode == 'terminal' and args.directory:
