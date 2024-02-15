@@ -4,7 +4,7 @@ import file_counter
 
 from file_operations import move_file
 
-def organize_by_type(filename, directory, logger, dry_run, move_records, progress_bar = None, root = None):
+def organize_by_type(filename, directory, logger, dry_run, move_records, progress_bar = None, root = None, log_table = None):
     if os.path.isfile(os.path.join(directory, filename)):
         file_type = filename.split('.')[-1]
         target_directory = os.path.join(directory, file_type)
@@ -13,13 +13,17 @@ def organize_by_type(filename, directory, logger, dry_run, move_records, progres
             os.makedirs(target_directory)
 
         file_path = os.path.join(directory, filename)
-        move_file(file_path, target_directory, logger, dry_run, move_records)
+
+        if log_table is not None:
+            move_file(file_path, target_directory, logger, dry_run, move_records, log_table)
+        else:
+            move_file(file_path, target_directory, logger, dry_run, move_records)
 
         if progress_bar is not None and root is not None:
             progress_bar['value'] = file_counter.curentFileNum * 100 / file_counter.filesCount
             root.update_idletasks()
 
-def organize_by_date(filename, directory, logger, dry_run, move_records, progress_bar = None, root = None):
+def organize_by_date(filename, directory, logger, dry_run, move_records, progress_bar = None, root = None, log_table = None):
     
     if os.path.isfile(os.path.join(directory, filename)):
         file_creation_time = os.path.getctime(os.path.join(directory, filename))
@@ -30,7 +34,11 @@ def organize_by_date(filename, directory, logger, dry_run, move_records, progres
             os.makedirs(target_directory)
 
         file_path = os.path.join(directory, filename)
-        move_file(file_path, target_directory, logger, dry_run, move_records)
+
+        if log_table is not None:
+            move_file(file_path, target_directory, logger, dry_run, move_records, log_table)
+        else:
+            move_file(file_path, target_directory, logger, dry_run, move_records)
 
         if progress_bar is not None and root is not None:
             progress_bar['value'] = file_counter.curentFileNum * 100 / file_counter.filesCount

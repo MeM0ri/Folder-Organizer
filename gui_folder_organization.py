@@ -2,6 +2,7 @@ import tkinter as tk
 import ttkbootstrap as ttk
 
 from tkinter import filedialog, messagebox
+from ttkbootstrap.tableview import Tableview
 from ttkbootstrap.constants import *
 from run_modes.gui_mode import run_gui_mode
 
@@ -109,12 +110,22 @@ def create_gui():
     )
     log_frame.pack(side = TOP, fill = "both", expand = True, padx = 5, pady = 5)
 
-    log_text = ttk.Text(
-        log_frame, 
-        height = 5, 
-        state = 'disabled'
+    coldata = [
+        "Operation",
+        "Dry run",
+        "File Name",
+        "Original path",
+        "Destination path"
+    ]
+
+    log_table = Tableview(
+        master = log_frame,
+        coldata = coldata,
+        autofit = False,
+        searchable = True
     )
-    log_text.pack(fill = "both", expand = True, padx = 5, pady = 5)
+
+    log_table.pack(fill = "both", expand = True, padx = 5, pady = 5)
 
     #Progress bar var
     progress_bar = ttk.Floodgauge(
@@ -135,7 +146,7 @@ def create_gui():
     organize_button = ttk.Button(
         buttons_frame, 
         text = "Organize Files",
-        command = lambda: run_gui_mode(chosen_type, progress_bar, undo_button, root, directory_entry, log_text, include_subdirs_var, dry_run_var)
+        command = lambda: run_gui_mode(chosen_type, progress_bar, undo_button, root, directory_entry, include_subdirs_var, dry_run_var, log_table)
     )
     organize_button.pack(side = LEFT, pady = 3, padx = (5, 0))
 
